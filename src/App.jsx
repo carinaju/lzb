@@ -10,10 +10,10 @@ import ROASTrendChart from './components/ROASTrendChart';
 import CampaignTable from './components/CampaignTable';
 
 import { useAdsSheetData } from './hooks/useAdsSheetData';
-import { useWixSheetData } from './hooks/useWixSheetData';
+import { useWixOrders } from './hooks/useWixOrders';
 
 import { parseAdsSheet, getAvailableMonths } from './utils/adsParser';
-import { parseWixSheet } from './utils/wixSheetParser';
+import { parseWixOrders } from './utils/wixParser';
 import { calcKPIs, calcCampaignRows, calcTrend } from './utils/roasCalculator';
 import { getMonthKey } from './utils/dateUtils';
 
@@ -49,12 +49,12 @@ export default function App() {
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
   const { adsRows, loading: adsLoading, error: adsError, refetch: refetchAds } = useAdsSheetData();
-  const { wixRows, loading: wixLoading, refetch: refetchWix } = useWixSheetData();
+  const { orders: wixOrders, loading: wixLoading, refetch: refetchWix } = useWixOrders();
 
   const loading = adsLoading || wixLoading;
 
   const adsMap = useMemo(() => parseAdsSheet(adsRows), [adsRows]);
-  const wixMap = useMemo(() => parseWixSheet(wixRows), [wixRows]);
+  const wixMap = useMemo(() => parseWixOrders(wixOrders), [wixOrders]);
 
   const wixConnected = wixMap.size > 0;
 
