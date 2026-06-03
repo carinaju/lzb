@@ -1,22 +1,18 @@
 import { parseDateString, getMonthKey } from './dateUtils';
 
-// Supermetrics sheet columns (0-indexed) — current layout:
+// Google Ads sheet columns (0-indexed) — current layout (campaign column included):
 // 0:  Date
-// 1:  Impressions
-// 2:  Clicks
-// 3:  CTR
-// 4:  CPC
-// 5:  Cost (Ad Spend)
-// 6:  Cost per conversion
-// 7:  Conversion rate
-// 8:  Total conversion value
-// 9:  All conversions value per cost
-// 10: ROAS (pre-calculated by Google Ads)
-//
-// MISSING for per-campaign breakdown:
-//   Add "Campaign" as a dimension in your Supermetrics query.
-//   Place it at column index 1 and shift the rest right.
-//   Set HAS_CAMPAIGN_COLUMN = true once that's done.
+// 1:  Campaign
+// 2:  Impressions
+// 3:  Clicks
+// 4:  CTR
+// 5:  Avg. CPC
+// 6:  Cost (Ad Spend)
+// 7:  Cost / conv.
+// 8:  Conv. rate
+// 9:  Conversions (direct count)
+// 10: All conv.
+// 11: Conversions value
 
 export const HAS_CAMPAIGN_COLUMN = true;
 
@@ -55,11 +51,9 @@ export function parseAdsSheet(rows) {
     const clicks          = parseNum(row[2 + colOffset]);
     // col 3: CTR, col 4: CPC — skip
     const spend           = parseNum(row[5 + colOffset]);
-    const costPerConv     = parseNum(row[6 + colOffset]);
-    // col 7: conversion rate — skip
-    const conversionValue = parseNum(row[8 + colOffset]);
-    // Derive conversion count from Cost ÷ Cost-per-conversion
-    const conversions     = costPerConv > 0 ? spend / costPerConv : 0;
+    // col 6: Cost/conv., col 7: Conv. rate — skip
+    const conversions     = parseNum(row[8 + colOffset]);  // col 9 = direct count
+    const conversionValue = parseNum(row[10 + colOffset]); // col 11 = Conversions value
 
     if (!monthMap.has(key)) {
       monthMap.set(key, { spend: 0, conversions: 0, conversionValue: 0, impressions: 0, clicks: 0, daysActive: 0, campaigns: new Map() });
