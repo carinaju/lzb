@@ -52,10 +52,12 @@ async function fetchMonthSummary(apiKey, siteId, year, month) {
   return { key, revenue, orderCount };
 }
 
-function last13Months() {
+// Fetch only the last 4 months (current + 3 previous) to stay within timeout.
+// Response is cached by Vercel CDN for 1 hour, so slow first-loads are rare.
+function last4Months() {
   const now = new Date();
   const months = [];
-  for (let i = 0; i < 13; i++) {
+  for (let i = 0; i < 4; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     months.push({ year: d.getFullYear(), month: d.getMonth() });
   }
@@ -71,7 +73,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const months = last13Months();
+    const months = last4Months();
     const results = await Promise.all(
       months.map(({ year, month }) => fetchMonthSummary(apiKey, siteId, year, month))
     );

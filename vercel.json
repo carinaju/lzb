@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/wix-orders.js": {
+      "maxDuration": 60
+    }
+  }
+}
